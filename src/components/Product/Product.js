@@ -6,7 +6,7 @@ export default function Product() {
   const ingUrl = 'https://chizpizza.com.ua/image/cache/catalog/478/4sira-478x478.jpg';
 
   return (
-    <div>
+    <div className="wrapper">
       <Card>
         <Card.Image src={ingUrl} />
         <Card.Body>

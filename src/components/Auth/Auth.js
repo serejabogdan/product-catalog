@@ -2,13 +2,26 @@ import React from 'react';
 import {Card, Form, Button} from 'bootstrap-4-react';
 import './Auth.css';
 
-export default function Auth() {
+export default function Auth(props) {
+  const {isSignUp} = props;
   return (
     <div className="wrapper">
       <Card>
         <Card.Body>
-          <Card.Title>Sign Up</Card.Title>
-          <Form>
+          <Card.Title>{isSignUp ? 'Sign Up' : 'Sign In'}</Card.Title>
+          <Form
+            onSubmit={
+              isSignUp
+                ? (e) => {
+                    e.preventDefault();
+                    console.log('Sign Up');
+                  }
+                : (e) => {
+                    e.preventDefault();
+                    console.log('Sign In');
+                  }
+            }
+          >
             <Form.Group>
               <label htmlFor="email-input">Email address</label>
               <Form.Input type="email" id="email-input" placeholder="Enter email" />
