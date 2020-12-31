@@ -2,6 +2,6 @@ const initialState = {
   currentUser: ''
 };
 
-export const authReducer = (state, action) => {
+export const authReducer = (state = initialState, action) => {
   return state;
 };
