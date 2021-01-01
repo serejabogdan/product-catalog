@@ -53,7 +53,7 @@ function Auth(props) {
   }
 
   return (
-    <div className="wrapper">
+    <div className="Auth">
       <Card>
         <Card.Body>
           <Card.Title>{isSignUp ? 'Sign Up' : 'Sign In'}</Card.Title>
