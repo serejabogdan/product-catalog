@@ -8,7 +8,7 @@ export default function Products() {
   return (
     <div className="Products">
       {products.map((product) => (
-        <Product />
+        <Product key={product} />
       ))}
     </div>
   );
