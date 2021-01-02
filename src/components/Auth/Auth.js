@@ -16,9 +16,9 @@ function Auth(props) {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       props.setCurrentUser(user);
-      if (user) {
+      /* if (user) {
         history.push('/products');
-      }
+      } */
     });
   }, []);
 
