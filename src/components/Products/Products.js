@@ -22,8 +22,19 @@ function Products({setProductsList, productsList}) {
   return (
     <div className="Products">
       {productsList.map((product) => {
-        const {title, price, description, file, date, discount} = product;
-        return <Product key={title} title={title} description={description} file={file} />;
+        const {productId, title, price, description, file, date, discount} = product;
+        return (
+          <Product
+            key={title}
+            title={title}
+            description={description}
+            file={file}
+            price={price}
+            date={date}
+            discount={discount}
+            productId={productId}
+          />
+        );
       })}
     </div>
   );
