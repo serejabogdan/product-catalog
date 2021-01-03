@@ -1,21 +1,32 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Card, Form, Button} from 'bootstrap-4-react';
 import {database, storage} from '../../firebaseConfig';
 
-export default function AddingProductForm() {
+import './ProductForm.css';
+
+export default function ProductForm() {
+  const [discount, setDiscount] = useState('');
+  const [isUploadData, setIsUploadData] = useState(false);
+
   async function handleSubmit(e) {
     e.preventDefault();
-    const form = e.target;
-    const formData = getDataForm(form);
-    const productsRef = await database.ref('Products');
-    await putFileToStorage(formData.file);
-    const fileUrl = await getImageUrlFromStorage(formData.file);
-    formData.file = fileUrl;
-    productsRef.push(formData);
+    setIsUploadData(true);
+    try {
+      const form = e.target;
+      const formData = getDataForm(form);
+      const productsRef = await database.ref('Products');
+      await putFileToStorage(formData.file);
+      const fileUrl = await getImageUrlFromStorage(formData.file);
+      formData.file = fileUrl;
+      productsRef.push(formData);
+    } catch {
+      console.log('Data is not uloaded');
+    }
+    setIsUploadData(false);
   }
 
   async function putFileToStorage(file) {
-    storage.ref(`products/${file.name}`).put(file);
+    return storage.ref(`products/${file.name}`).put(file);
   }
 
   async function getImageUrlFromStorage(file) {
@@ -56,7 +67,7 @@ export default function AddingProductForm() {
   }
 
   return (
-    <div className="wrapper">
+    <div className="ProductForm">
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
@@ -80,15 +91,24 @@ export default function AddingProductForm() {
             </Form.Group>
             <Form.Group>
               <label htmlFor="discount">Процент скидки</label>
-              <Form.Input type="text" id="discount" name="discount" placeholder="10-90%" />
+              <Form.Input
+                type="text"
+                id="discount"
+                name="discount"
+                placeholder="10-90%"
+                onChange={(e) => setDiscount(e.target.value)}
+                value={discount}
+              />
             </Form.Group>
-            <Form.Group>
-              <label htmlFor="discount-end-date">Дата окончания скидки</label>
-              <div className="date">
-                <input type="date" id="discount-end-date" name="date" min={DateToday()} defaultValue={DateToday()} />
-              </div>
-            </Form.Group>
-            <Button primary type="submit">
+            {discount && (
+              <Form.Group>
+                <label htmlFor="discount-end-date">Дата окончания скидки*</label>
+                <div className="date">
+                  <input type="date" id="discount-end-date" name="date" min={DateToday()} defaultValue={DateToday()} />
+                </div>
+              </Form.Group>
+            )}
+            <Button primary type="submit" disabled={isUploadData}>
               Submit
             </Button>
           </Form>
