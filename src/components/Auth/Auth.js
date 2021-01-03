@@ -10,7 +10,7 @@ import {setCurrentUser} from '../../redux/actions';
 
 function Auth(props) {
   const {isSignUp} = props;
-  const [userData, setUserData] = useState({email: '', password: ''});
+  const [userData, setUserData] = useState({email: 'a2@gmail.com', password: '123456'});
   const history = useHistory();
 
   useEffect(() => {
@@ -84,7 +84,7 @@ function Auth(props) {
             </Button>
           </Form>
           <div className="signin-link">
-            {isSignUp ? <Link to="/signIn">Войти в аккаунт</Link> : <Link to="/">Зарегистрироваться</Link>}
+            {isSignUp ? <Link to="/">Войти в аккаунт</Link> : <Link to="/signUp">Зарегистрироваться</Link>}
           </div>
         </Card.Body>
       </Card>
