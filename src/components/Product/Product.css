@@ -8,3 +8,16 @@
 .delete-button {
   margin-right: 1rem;
 }
+
+.product__price {
+  padding: 0 1.25rem 1.25rem;
+}
+
+.discount-price {
+  color: red;
+  margin-right: 1rem;
+}
+
+.discount-active {
+  text-decoration: line-through;
+}
