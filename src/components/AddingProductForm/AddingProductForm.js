@@ -1,11 +1,25 @@
 import React from 'react';
 import {Card, Form, Button} from 'bootstrap-4-react';
+import {database, storage} from '../../firebaseConfig';
 
 export default function AddingProductForm() {
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
-    getDataForm(form);
+    const formData = getDataForm(form);
+    const productsRef = await database.ref('Products');
+    await putFileToStorage(formData.file);
+    const fileUrl = await getImageUrlFromStorage(formData.file);
+    formData.file = fileUrl;
+    productsRef.push(formData);
+  }
+
+  async function putFileToStorage(file) {
+    storage.ref(`products/${file.name}`).put(file);
+  }
+
+  async function getImageUrlFromStorage(file) {
+    return storage.ref('products').child(file.name).getDownloadURL();
   }
 
   function getDataForm(form) {
