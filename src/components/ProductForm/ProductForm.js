@@ -4,22 +4,33 @@ import {database, storage} from '../../firebaseConfig';
 
 import './ProductForm.css';
 import {useForm} from 'react-hook-form';
+import {connect} from 'react-redux';
 
-export default function ProductForm() {
+function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
   const {register, handleSubmit, errors, watch} = useForm();
-  const isDiscount = watch('discount', false);
+  const isDiscount = watch('discount', true);
 
   async function onSubmit(formData) {
     const convertedFormData = formDataConvert(formData);
 
     setIsUploadData(true);
     try {
-      const productsRef = await database.ref('Products');
+      let productsRef = '';
+      if (selectedProduct) {
+        productsRef = await database.ref(`Products/${selectedProduct.productId}`);
+      } else {
+        productsRef = await database.ref('Products');
+      }
+
       await putFileToStorage(convertedFormData.file);
       const fileUrl = await getImageUrlFromStorage(convertedFormData.file);
       convertedFormData.file = fileUrl;
-      productsRef.push(convertedFormData);
+      if (selectedProduct) {
+        productsRef.set(convertedFormData);
+      } else {
+        productsRef.push(convertedFormData);
+      }
     } catch {
       console.log('Data is not uloaded');
     }
@@ -71,6 +82,7 @@ export default function ProductForm() {
                 name="title"
                 placeholder="Введите заголовок"
                 className="form-control"
+                defaultValue={selectedProduct && selectedProduct.title}
                 ref={register({
                   required: 'Заголовок пуст.',
                   minLength: {value: 20, message: 'Введено менее 20-ти симоволов.'},
@@ -92,7 +104,6 @@ export default function ProductForm() {
                 className="input-block"
                 ref={register({required: 'Фото не загружено.'})}
               />
-
               {errors.file && (
                 <Alert className="alert" danger>
                   {errors.file.message}
@@ -105,6 +116,7 @@ export default function ProductForm() {
                 type="text"
                 id="description"
                 name="description"
+                defaultValue={selectedProduct && selectedProduct.description}
                 rows="3"
                 className="form-control"
                 ref={register({maxLength: {value: 200, message: 'Максимальное кол-во символов - 200'}})}
@@ -121,6 +133,7 @@ export default function ProductForm() {
                 type="text"
                 name="price"
                 id="price"
+                defaultValue={selectedProduct && selectedProduct.price}
                 className="form-control"
                 placeholder="99999999.99$"
                 ref={register({
@@ -144,6 +157,7 @@ export default function ProductForm() {
                 className="form-control"
                 placeholder="10-90%"
                 id="discount"
+                defaultValue={selectedProduct && selectedProduct.discount}
                 name="discount"
                 ref={register({
                   min: {value: 10, message: 'Минимальное значение 10.'},
@@ -171,7 +185,7 @@ export default function ProductForm() {
               </Form.Group>
             )}
             <Button primary type="submit" disabled={isUploadData}>
-              Submit
+              {isDefaultForm ? 'Добавить' : 'Изменить'}
             </Button>
           </Form>
         </Card.Body>
@@ -179,3 +193,13 @@ export default function ProductForm() {
     </div>
   );
 }
+
+const mapStateToProps = (state) => {
+  const {idSelectedProduct, productsList} = state.products;
+  return {
+    idSelectedProduct: idSelectedProduct,
+    selectedProduct: productsList.find((product) => product.productId === idSelectedProduct)
+  };
+};
+
+export default connect(mapStateToProps)(ProductForm);

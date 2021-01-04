@@ -37,7 +37,8 @@ function Product({productId, title, price, description, file, date, discount, se
   }
 
   function getDiscountPrice() {
-    return price - (price * discount) / 100;
+    const discountPrice = price - (price * discount) / 100;
+    return discountPrice.toFixed(2);
   }
 
   function onDeleteProduct() {
