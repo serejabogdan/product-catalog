@@ -3,7 +3,7 @@ import './App.css';
 import Auth from './Auth/Auth';
 import ProductForm from './ProductForm/ProductForm';
 import Products from './Products/Products';
-import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
+import {HashRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import {connect} from 'react-redux';
 import Menu from './Menu/Menu';
