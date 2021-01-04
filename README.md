@@ -2,7 +2,7 @@
 
 This picture shows what the page looks like.
 
-[Product Catalog link](https://serejabogdan.github.io/pizza-store/) to view
+[Product Catalog link](https://serejabogdan.github.io/product-catalog/) to view
 
 ![Product Catalog](https://s2.gifyu.com/images/pizza.png)
 
