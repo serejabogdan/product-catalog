@@ -8,6 +8,7 @@ import {connect} from 'react-redux';
 
 import {setCurrentUser} from '../../redux/actions';
 import {signIn, signUp} from '../../utils/auth';
+import {PATH_PRODUCTS} from '../../utils/constants';
 
 function Auth(props) {
   const {isSignUp} = props;
@@ -29,7 +30,7 @@ function Auth(props) {
       } else {
         await signIn(userData.email, userData.password);
       }
-      history.push('/products');
+      history.push(`/${PATH_PRODUCTS}`);
     } catch {
       console.error('Failed an operation');
     }

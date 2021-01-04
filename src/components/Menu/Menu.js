@@ -3,10 +3,11 @@ import {Button} from 'bootstrap-4-react/lib/components';
 import {NavLink, useLocation} from 'react-router-dom';
 import './Menu.css';
 import {signOut} from '../../utils/auth';
+import {PATH_PRODUCTS} from '../../utils/constants';
 
 export default function Menu() {
   const {pathname} = useLocation();
-  const productsPath = '/products';
+  const productsPath = `/${PATH_PRODUCTS}`;
   const formPath = '/form';
   return (
     <nav className="menu">
