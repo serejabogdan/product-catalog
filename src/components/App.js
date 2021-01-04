@@ -15,7 +15,8 @@ function App({isUserAuth}) {
         {isUserAuth && <Menu />}
         <Switch>
           <PrivateRoute path="/products" isUserAuth={isUserAuth} component={Products} />
-          <PrivateRoute path="/form" isUserAuth={isUserAuth} component={ProductForm} />
+          <PrivateRoute path="/form" isDefaultForm={true} isUserAuth={isUserAuth} component={ProductForm} />
+          <PrivateRoute path="/change-form" isDefaultForm={false} isUserAuth={isUserAuth} component={ProductForm} />
           {isUserAuth && <Redirect exact from="/" to="/products" />}
           <Route path="/signUp" render={() => <Auth isSignUp={true} />} />
           <Route path="/" render={() => <Auth isSignUp={false} />} />
