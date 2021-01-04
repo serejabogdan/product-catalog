@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Card, Form, Button, Alert} from 'bootstrap-4-react';
+import {Card, Form, Button} from 'bootstrap-4-react';
 import './ProductForm.css';
 import {useForm} from 'react-hook-form';
 import {connect} from 'react-redux';
@@ -7,6 +7,7 @@ import {getRef} from '../../utils/database';
 import {PATH_PRODUCTS} from '../../utils/constants';
 import {getImageUrlFromStorage, putFileToStorage} from '../../utils/storage';
 import {formDataConvert, getDateToday} from '../../utils/utils';
+import Error from '../Error/Error';
 
 function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
@@ -67,11 +68,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                   maxLength: {value: 60, message: 'Введено более 60-ти симоволов.'}
                 })}
               />
-              {errors.title && (
-                <Alert className="alert" danger>
-                  {errors.title.message}
-                </Alert>
-              )}
+              <Error error={errors.title} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="file">Фото*</label>
@@ -82,11 +79,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 className="input-block"
                 ref={register({required: 'Фото не загружено.'})}
               />
-              {errors.file && (
-                <Alert className="alert" danger>
-                  {errors.file.message}
-                </Alert>
-              )}
+              <Error error={errors.file} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="description">Описание товара</label>
@@ -99,11 +92,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 className="form-control"
                 ref={register({maxLength: {value: 200, message: 'Максимальное кол-во символов - 200'}})}
               />
-              {errors.description && (
-                <Alert className="alert" danger>
-                  {errors.description.message}
-                </Alert>
-              )}
+              <Error error={errors.description} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="price">Цена*</label>
@@ -122,11 +111,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                   } /* pattern: /^\d{1,8}[.]?\d{1,2}$/ */
                 })}
               />
-              {errors.price && (
-                <Alert className="alert" danger>
-                  {errors.price.message}
-                </Alert>
-              )}
+              <Error error={errors.price} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="discount">Процент скидки</label>
@@ -142,11 +127,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                   max: {value: 90, message: 'Максимальное значение 90.'}
                 })}
               />
-              {errors.discount && (
-                <Alert className="alert" danger>
-                  {errors.discount.message}
-                </Alert>
-              )}
+              <Error error={errors.discount} />
             </Form.Group>
             {isDiscount && (
               <Form.Group>
