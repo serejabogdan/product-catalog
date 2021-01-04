@@ -33,9 +33,11 @@ function Product({productId, title, price, description, file, date, discount, se
   }
 
   return (
-    <div className="Product">
+    <div className="product">
       <Card>
-        <Card.Image src={file} />
+        <div className="product__image">
+          <img src={file} alt="" />
+        </div>
         <Card.Body>
           <Card.Title>{title}</Card.Title>
           <Card.Text>{description}</Card.Text>
@@ -43,15 +45,21 @@ function Product({productId, title, price, description, file, date, discount, se
         <div className="product__price">
           {isDiscountValid && (
             <>
-              <div className="discount-days">{getDiscountDaysLeft()}</div>
-              <div className="discount-persent">{discount}% скидка</div>
-              <span className="discount-price">{getDiscountPrice()} грн.</span>
+              <div className="product__discount-days">{getDiscountDaysLeft()}</div>
+              <div className="product__discount-persent">{discount}% скидка</div>
+              <span className="product__discount-price">{getDiscountPrice()} грн.</span>
             </>
           )}
-          <span className={`current-price ${isDiscountValid && 'discount-active'}`}>{price} грн.</span>
+          <span className={`product__current-price ${isDiscountValid && 'product__discount-active'}`}>
+            {price} грн.
+          </span>
         </div>
         <Card.Footer>
-          <Button className="delete-button" primary onClick={() => onDeleteProduct(`${PATH_PRODUCTS}/${productId}`)}>
+          <Button
+            className="product__delete-button"
+            primary
+            onClick={() => onDeleteProduct(`${PATH_PRODUCTS}/${productId}`)}
+          >
             Удалить
           </Button>
           <Button primary onClick={onChangeProduct}>

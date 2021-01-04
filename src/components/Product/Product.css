@@ -1,11 +1,15 @@
-.Product {
+.product {
   width: 25%;
   padding: 0 1rem;
   display: flex;
   margin: 1rem 0;
 }
 
-.delete-button {
+.card-body {
+  padding-top: 0;
+}
+
+.product__delete-button {
   margin-right: 1rem;
 }
 
@@ -13,11 +17,16 @@
   padding: 0 1.25rem 1.25rem;
 }
 
-.discount-price {
+.product__discount-price {
   color: red;
   margin-right: 1rem;
 }
 
-.discount-active {
+.product__discount-active {
   text-decoration: line-through;
+}
+
+.product__image img {
+  width: 100%;
+  padding: 0 0.4rem;
 }
