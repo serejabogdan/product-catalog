@@ -3,7 +3,7 @@ import './App.css';
 import Auth from './Auth/Auth';
 import ProductForm from './ProductForm/ProductForm';
 import Products from './Products/Products';
-import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import {connect} from 'react-redux';
 import Menu from './Menu/Menu';
@@ -16,7 +16,8 @@ function App({isUserAuth}) {
         <Switch>
           <PrivateRoute path="/products" isUserAuth={isUserAuth} component={Products} />
           <PrivateRoute path="/form" isUserAuth={isUserAuth} component={ProductForm} />
-          <Route exact path="/signUp" render={() => <Auth isSignUp={true} />} />
+          {isUserAuth && <Redirect exact from="/" to="/products" />}
+          <Route path="/signUp" render={() => <Auth isSignUp={true} />} />
           <Route path="/" render={() => <Auth isSignUp={false} />} />
         </Switch>
       </Router>
