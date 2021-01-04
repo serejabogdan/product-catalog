@@ -3,12 +3,12 @@ import {Card, Form, Button, Alert} from 'bootstrap-4-react';
 import {database, storage} from '../../firebaseConfig';
 
 import './ProductForm.css';
-import {Controller, useForm} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 
 export default function ProductForm() {
-  const [discount, setDiscount] = useState('');
   const [isUploadData, setIsUploadData] = useState(false);
-  const {register, handleSubmit, errors, control} = useForm();
+  const {register, handleSubmit, errors, watch} = useForm();
+  const isDiscount = watch('discount', false);
 
   async function onSubmit(formData) {
     const convertedFormData = formDataConvert(formData);
@@ -139,28 +139,24 @@ export default function ProductForm() {
             </Form.Group>
             <Form.Group>
               <label htmlFor="discount">Процент скидки</label>
-              <Controller
+              <input
+                type="text"
+                className="form-control"
+                placeholder="10-90%"
+                id="discount"
                 name="discount"
-                control={control}
-                defaultValue=""
-                rules={{min: 10, max: 90}}
-                render={({onChange, value}) => (
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="10-90%"
-                    id="discount"
-                    value={value}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setDiscount(value);
-                      onChange(value);
-                    }}
-                  />
-                )}
+                ref={register({
+                  min: {value: 10, message: 'Минимальное значение 10.'},
+                  max: {value: 90, message: 'Максимальное значение 90.'}
+                })}
               />
+              {errors.discount && (
+                <Alert className="alert" danger>
+                  {errors.discount.message}
+                </Alert>
+              )}
             </Form.Group>
-            {discount && (
+            {isDiscount && (
               <Form.Group>
                 <label htmlFor="discount-end-date">Дата окончания скидки*</label>
                 <input
