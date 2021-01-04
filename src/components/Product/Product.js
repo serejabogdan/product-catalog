@@ -9,26 +9,30 @@ export default function Product({productId, title, price, description, file, dat
     const oneHour = 3600000;
     const hoursLeft = Math.floor((date - Date.now()) / oneHour);
     const daysLeft = Math.floor(hoursLeft / 24);
-    return `До конца акции ${daysLeft} ${pluralType(daysLeft)}`;
+    if (!daysLeft) {
+      return `До конца акции ${hoursLeft} ${pluralType(hoursLeft, 'час', 'часа', 'часов')}`;
+    }
+    return `До конца акции ${daysLeft} ${pluralType(daysLeft, 'день', 'дня', 'дней')}`;
   }
 
-  function pluralType(value) {
-    const dayOne = 'день';
-    const dayTwo = 'дня';
-    const dayThree = 'дней';
+  function pluralType(value, oneType, twoType, threeType) {
     value = Math.abs(value);
     value %= 100;
     if (value >= 5 && value <= 20) {
-      return dayThree;
+      return threeType;
     }
     value %= 10;
     if (value === 1) {
-      return dayOne;
+      return oneType;
     }
     if (value >= 2 && value <= 4) {
-      return dayTwo;
+      return twoType;
     }
-    return dayThree;
+    return threeType;
+  }
+
+  function getDiscountPrice() {
+    return price - (price * discount) / 100;
   }
 
   return (
@@ -44,7 +48,7 @@ export default function Product({productId, title, price, description, file, dat
             <>
               <div className="discount-days">{getDiscountDaysLeft()}</div>
               <div className="discount-persent">{discount}% скидка</div>
-              <span className="discount-price">{price - (price * discount) / 100} грн.</span>
+              <span className="discount-price">{getDiscountPrice()} грн.</span>
             </>
           )}
           <span className={`current-price ${isDiscountValid && 'discount-active'}`}>{price} грн.</span>
