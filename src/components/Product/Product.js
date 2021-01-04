@@ -1,6 +1,7 @@
 import React from 'react';
 import {Card, Button} from 'bootstrap-4-react';
 import './Product.css';
+import {database} from '../../firebaseConfig';
 
 export default function Product({productId, title, price, description, file, date, discount}) {
   const isDiscountValid = date > Date.now();
@@ -35,6 +36,10 @@ export default function Product({productId, title, price, description, file, dat
     return price - (price * discount) / 100;
   }
 
+  function onDeleteProduct() {
+    database.ref(`Products/${productId}`).remove();
+  }
+
   return (
     <div className="Product">
       <Card>
@@ -54,7 +59,7 @@ export default function Product({productId, title, price, description, file, dat
           <span className={`current-price ${isDiscountValid && 'discount-active'}`}>{price} грн.</span>
         </div>
         <Card.Footer>
-          <Button className="delete-button" primary>
+          <Button className="delete-button" primary onClick={onDeleteProduct}>
             Удалить
           </Button>
           <Button primary>Изменить</Button>
