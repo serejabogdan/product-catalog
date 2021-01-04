@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
-import {Card, Form, Button} from 'bootstrap-4-react';
+import {Card, Form, Button, Alert} from 'bootstrap-4-react';
 import {database, storage} from '../../firebaseConfig';
 
 import './ProductForm.css';
-import {useForm} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 
 export default function ProductForm() {
   const [discount, setDiscount] = useState('');
   const [isUploadData, setIsUploadData] = useState(false);
-  const {register, handleSubmit, errors} = useForm();
+  const {register, handleSubmit, errors, control} = useForm();
 
   async function onSubmit(formData) {
     const convertedFormData = formDataConvert(formData);
@@ -29,9 +29,12 @@ export default function ProductForm() {
   function formDataConvert(data) {
     const newData = data;
     newData.file = data.file[0];
-    const oneDayMs = 86400000;
-    const dateInMs = Date.parse(data.date);
-    newData.date = dateInMs + oneDayMs;
+    if (data.date) {
+      const oneDayMs = 86400000;
+      const dateInMs = Date.parse(data.date);
+      newData.date = dateInMs + oneDayMs;
+    }
+
     return newData;
   }
 
@@ -68,12 +71,33 @@ export default function ProductForm() {
                 name="title"
                 placeholder="Введите заголовок"
                 className="form-control"
-                ref={register({required: true, minLength: 20, maxLength: 60})}
+                ref={register({
+                  required: 'Заголовок пуст.',
+                  minLength: {value: 20, message: 'Введено менее 20-ти симоволов.'},
+                  maxLength: {value: 60, message: 'Введено более 60-ти симоволов.'}
+                })}
               />
+              {errors.title && (
+                <Alert className="alert" danger>
+                  {errors.title.message}
+                </Alert>
+              )}
             </Form.Group>
             <Form.Group>
               <label htmlFor="file">Фото*</label>
-              <input type="file" name="file" id="file" className="input-block" ref={register({required: true})} />
+              <input
+                type="file"
+                name="file"
+                id="file"
+                className="input-block"
+                ref={register({required: 'Фото не загружено.'})}
+              />
+
+              {errors.file && (
+                <Alert className="alert" danger>
+                  {errors.file.message}
+                </Alert>
+              )}
             </Form.Group>
             <Form.Group>
               <label htmlFor="description">Описание товара</label>
@@ -83,8 +107,13 @@ export default function ProductForm() {
                 name="description"
                 rows="3"
                 className="form-control"
-                ref={register({maxLength: 200})}
+                ref={register({maxLength: {value: 200, message: 'Максимальное кол-во символов - 200'}})}
               />
+              {errors.description && (
+                <Alert className="alert" danger>
+                  {errors.description.message}
+                </Alert>
+              )}
             </Form.Group>
             <Form.Group>
               <label htmlFor="price">Цена*</label>
@@ -95,22 +124,40 @@ export default function ProductForm() {
                 className="form-control"
                 placeholder="99999999.99$"
                 ref={register({
-                  required: true,
-                  max: 99999999.99 /* pattern: /^\d{1,8}[.]?\d{1,2}$/ */
+                  required: 'Цена не введена.',
+                  max: {
+                    value: 99999999.9,
+                    message: 'Максимальное значение 99999999.9'
+                  } /* pattern: /^\d{1,8}[.]?\d{1,2}$/ */
                 })}
               />
+              {errors.price && (
+                <Alert className="alert" danger>
+                  {errors.price.message}
+                </Alert>
+              )}
             </Form.Group>
             <Form.Group>
               <label htmlFor="discount">Процент скидки</label>
-              <input
-                type="text"
+              <Controller
                 name="discount"
-                className="form-control"
-                placeholder="10-90%"
-                id="discount"
-                ref={register({min: 10, max: 90})}
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
+                control={control}
+                defaultValue=""
+                rules={{min: 10, max: 90}}
+                render={({onChange, value}) => (
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="10-90%"
+                    id="discount"
+                    value={value}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setDiscount(value);
+                      onChange(value);
+                    }}
+                  />
+                )}
               />
             </Form.Group>
             {discount && (
