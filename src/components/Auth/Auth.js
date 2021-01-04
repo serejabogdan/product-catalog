@@ -7,6 +7,8 @@ import {auth} from '../../firebaseConfig';
 import {connect} from 'react-redux';
 
 import {setCurrentUser} from '../../redux/actions';
+import {signIn, signUp} from '../../utils/auth';
+import {PATH_PRODUCTS} from '../../utils/constants';
 
 function Auth(props) {
   const {isSignUp} = props;
@@ -16,39 +18,21 @@ function Auth(props) {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       props.setCurrentUser(user);
-      /* if (user) {
-        history.push('/products');
-      } */
     });
   }, []);
 
-  function signup(email, password) {
-    return auth.createUserWithEmailAndPassword(email, password);
-  }
-
-  function signin(email, password) {
-    return auth.signInWithEmailAndPassword(email, password);
-  }
-
-  async function signUpHandleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     try {
-      await signup(userData.email, userData.password);
-      history.push('/products');
+      if (isSignUp) {
+        await signUp(userData.email, userData.password);
+      } else {
+        await signIn(userData.email, userData.password);
+      }
+      history.push(`/${PATH_PRODUCTS}`);
     } catch {
-      console.error('Failed to create an account');
-    }
-  }
-
-  async function signInHandleSubmit(e) {
-    e.preventDefault();
-
-    try {
-      await signin(userData.email, userData.password);
-      history.push('/products');
-    } catch {
-      console.error('Failed to log in');
+      console.error('Failed an operation');
     }
   }
 
@@ -57,7 +41,7 @@ function Auth(props) {
       <Card>
         <Card.Body>
           <Card.Title>{isSignUp ? 'Sign Up' : 'Sign In'}</Card.Title>
-          <Form onSubmit={isSignUp ? signUpHandleSubmit : signInHandleSubmit}>
+          <Form onSubmit={handleSubmit}>
             <Form.Group>
               <label htmlFor="email-input">Email address</label>
               <Form.Input
@@ -65,6 +49,7 @@ function Auth(props) {
                 id="email-input"
                 placeholder="Enter email"
                 value={userData.email}
+                required
                 onChange={(e) => setUserData((state) => ({...state, email: e.target.value}))}
               />
             </Form.Group>
@@ -75,6 +60,7 @@ function Auth(props) {
                 id="password-imput"
                 placeholder="Password"
                 value={userData.password}
+                required
                 onChange={(e) => setUserData((state) => ({...state, password: e.target.value}))}
               />
             </Form.Group>

@@ -1,72 +1,51 @@
 import React, {useState} from 'react';
-import {Card, Form, Button, Alert} from 'bootstrap-4-react';
-import {database, storage} from '../../firebaseConfig';
-
+import {Card, Form, Button} from 'bootstrap-4-react';
 import './ProductForm.css';
 import {useForm} from 'react-hook-form';
 import {connect} from 'react-redux';
+import {getRef} from '../../utils/database';
+import {PATH_PRODUCTS} from '../../utils/constants';
+import {getImageUrlFromStorage, putFileToStorage} from '../../utils/storage';
+import {formDataConvert, getDateToday} from '../../utils/utils';
+import Error from '../Error/Error';
 
 function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
   const {register, handleSubmit, errors, watch} = useForm();
-  const isDiscount = watch('discount', true);
+  const isDiscount = watch('discount', selectedProduct ? true : false);
 
   async function onSubmit(formData) {
-    const convertedFormData = formDataConvert(formData);
+    const convertedData = formDataConvert(formData);
 
     setIsUploadData(true);
+    const productsRef = getProductsRef();
     try {
-      let productsRef = '';
-      if (selectedProduct) {
-        productsRef = await database.ref(`Products/${selectedProduct.productId}`);
-      } else {
-        productsRef = await database.ref('Products');
-      }
-
-      await putFileToStorage(convertedFormData.file);
-      const fileUrl = await getImageUrlFromStorage(convertedFormData.file);
-      convertedFormData.file = fileUrl;
-      if (selectedProduct) {
-        productsRef.set(convertedFormData);
-      } else {
-        productsRef.push(convertedFormData);
-      }
+      await putFileToStorage(convertedData.file);
+      const fileUrl = await getImageUrlFromStorage(convertedData.file);
+      convertedData.file = fileUrl;
+      putDataToDB(productsRef, convertedData);
     } catch {
       console.log('Data is not uloaded');
     }
     setIsUploadData(false);
   }
 
-  function formDataConvert(data) {
-    const newData = data;
-    newData.file = data.file[0];
-    if (data.date) {
-      const oneDayMs = 86400000;
-      const dateInMs = Date.parse(data.date);
-      newData.date = dateInMs + oneDayMs;
+  function getProductsRef() {
+    let productsPath = '';
+    if (selectedProduct) {
+      productsPath = `${PATH_PRODUCTS}/${selectedProduct.productId}`;
+    } else {
+      productsPath = PATH_PRODUCTS;
     }
-
-    return newData;
+    return getRef(productsPath);
   }
 
-  async function putFileToStorage(file) {
-    return storage.ref(`products/${file.name}`).put(file);
-  }
-
-  async function getImageUrlFromStorage(file) {
-    return storage.ref('products').child(file.name).getDownloadURL();
-  }
-
-  function DateToday() {
-    const date = new Date();
-    const year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let day = date.getDate();
-
-    month = month > 10 ? month : `0${month}`;
-    day = day > 10 ? day : `0${day}`;
-
-    return `${year}-${month}-${day}`;
+  function putDataToDB(ref, data) {
+    if (selectedProduct) {
+      ref.set(data);
+    } else {
+      ref.push(data);
+    }
   }
 
   return (
@@ -89,11 +68,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                   maxLength: {value: 60, message: 'Введено более 60-ти симоволов.'}
                 })}
               />
-              {errors.title && (
-                <Alert className="alert" danger>
-                  {errors.title.message}
-                </Alert>
-              )}
+              <Error error={errors.title} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="file">Фото*</label>
@@ -104,11 +79,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 className="input-block"
                 ref={register({required: 'Фото не загружено.'})}
               />
-              {errors.file && (
-                <Alert className="alert" danger>
-                  {errors.file.message}
-                </Alert>
-              )}
+              <Error error={errors.file} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="description">Описание товара</label>
@@ -121,11 +92,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 className="form-control"
                 ref={register({maxLength: {value: 200, message: 'Максимальное кол-во символов - 200'}})}
               />
-              {errors.description && (
-                <Alert className="alert" danger>
-                  {errors.description.message}
-                </Alert>
-              )}
+              <Error error={errors.description} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="price">Цена*</label>
@@ -144,11 +111,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                   } /* pattern: /^\d{1,8}[.]?\d{1,2}$/ */
                 })}
               />
-              {errors.price && (
-                <Alert className="alert" danger>
-                  {errors.price.message}
-                </Alert>
-              )}
+              <Error error={errors.price} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="discount">Процент скидки</label>
@@ -164,11 +127,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                   max: {value: 90, message: 'Максимальное значение 90.'}
                 })}
               />
-              {errors.discount && (
-                <Alert className="alert" danger>
-                  {errors.discount.message}
-                </Alert>
-              )}
+              <Error error={errors.discount} />
             </Form.Group>
             {isDiscount && (
               <Form.Group>
@@ -178,8 +137,8 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                   id="discount-end-date"
                   className="input-block"
                   name="date"
-                  min={DateToday()}
-                  defaultValue={DateToday()}
+                  min={getDateToday()}
+                  defaultValue={getDateToday()}
                   ref={register({required: true})}
                 />
               </Form.Group>
