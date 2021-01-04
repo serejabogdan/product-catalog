@@ -1,10 +1,12 @@
 import React from 'react';
 import {Card, Button} from 'bootstrap-4-react';
 import './Product.css';
-import {database} from '../../firebaseConfig';
 import {connect} from 'react-redux';
 import {setIdSelectedProduct} from '../../redux/actions';
 import {useHistory} from 'react-router-dom';
+import {PATH_PRODUCTS} from '../../utils/constants';
+import {onDeleteProduct} from '../../utils/database';
+import {pluralType} from '../../utils/utils';
 
 function Product({productId, title, price, description, file, date, discount, setIdSelectedProduct}) {
   const history = useHistory();
@@ -20,29 +22,9 @@ function Product({productId, title, price, description, file, date, discount, se
     return `До конца акции ${daysLeft} ${pluralType(daysLeft, 'день', 'дня', 'дней')}`;
   }
 
-  function pluralType(value, oneType, twoType, threeType) {
-    value = Math.abs(value);
-    value %= 100;
-    if (value >= 5 && value <= 20) {
-      return threeType;
-    }
-    value %= 10;
-    if (value === 1) {
-      return oneType;
-    }
-    if (value >= 2 && value <= 4) {
-      return twoType;
-    }
-    return threeType;
-  }
-
   function getDiscountPrice() {
     const discountPrice = price - (price * discount) / 100;
     return discountPrice.toFixed(2);
-  }
-
-  function onDeleteProduct() {
-    database.ref(`Products/${productId}`).remove();
   }
 
   function onChangeProduct() {
@@ -69,7 +51,7 @@ function Product({productId, title, price, description, file, date, discount, se
           <span className={`current-price ${isDiscountValid && 'discount-active'}`}>{price} грн.</span>
         </div>
         <Card.Footer>
-          <Button className="delete-button" primary onClick={onDeleteProduct}>
+          <Button className="delete-button" primary onClick={() => onDeleteProduct(`${PATH_PRODUCTS}/${productId}`)}>
             Удалить
           </Button>
           <Button primary onClick={onChangeProduct}>

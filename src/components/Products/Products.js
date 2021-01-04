@@ -2,13 +2,14 @@ import React, {useEffect} from 'react';
 import Product from '../Product/Product';
 import './Products.css';
 
-import {database} from '../../firebaseConfig';
 import {connect} from 'react-redux';
 import {setProductsList} from '../../redux/actions';
+import {getRef} from '../../utils/database';
+import {PATH_PRODUCTS} from '../../utils/constants';
 
 function Products({setProductsList, productsList}) {
   useEffect(() => {
-    const data = database.ref('Products');
+    const data = getRef(PATH_PRODUCTS);
     data.on('value', (snapshot) => {
       const data = snapshot.val();
       const productsList = [];
@@ -19,6 +20,7 @@ function Products({setProductsList, productsList}) {
       console.log(productsList);
     });
   }, []);
+
   return (
     <div className="Products">
       {productsList.map((product) => {

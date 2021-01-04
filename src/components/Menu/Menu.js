@@ -1,8 +1,8 @@
 import React from 'react';
 import {Button} from 'bootstrap-4-react/lib/components';
 import {NavLink, useLocation} from 'react-router-dom';
-import {auth} from '../../firebaseConfig';
 import './Menu.css';
+import {signOut} from '../../utils/auth';
 
 export default function Menu() {
   const {pathname} = useLocation();
@@ -22,7 +22,7 @@ export default function Menu() {
       )}
 
       <NavLink to="/" className="menu__link">
-        <Button primary onClick={() => auth.signOut()}>
+        <Button primary onClick={signOut}>
           Выйти
         </Button>
       </NavLink>

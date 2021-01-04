@@ -7,6 +7,7 @@ import {auth} from '../../firebaseConfig';
 import {connect} from 'react-redux';
 
 import {setCurrentUser} from '../../redux/actions';
+import {signIn, signUp} from '../../utils/auth';
 
 function Auth(props) {
   const {isSignUp} = props;
@@ -16,39 +17,21 @@ function Auth(props) {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       props.setCurrentUser(user);
-      /* if (user) {
-        history.push('/products');
-      } */
     });
   }, []);
 
-  function signup(email, password) {
-    return auth.createUserWithEmailAndPassword(email, password);
-  }
-
-  function signin(email, password) {
-    return auth.signInWithEmailAndPassword(email, password);
-  }
-
-  async function signUpHandleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     try {
-      await signup(userData.email, userData.password);
+      if (isSignUp) {
+        await signUp(userData.email, userData.password);
+      } else {
+        await signIn(userData.email, userData.password);
+      }
       history.push('/products');
     } catch {
-      console.error('Failed to create an account');
-    }
-  }
-
-  async function signInHandleSubmit(e) {
-    e.preventDefault();
-
-    try {
-      await signin(userData.email, userData.password);
-      history.push('/products');
-    } catch {
-      console.error('Failed to log in');
+      console.error('Failed an operation');
     }
   }
 
@@ -57,7 +40,7 @@ function Auth(props) {
       <Card>
         <Card.Body>
           <Card.Title>{isSignUp ? 'Sign Up' : 'Sign In'}</Card.Title>
-          <Form onSubmit={isSignUp ? signUpHandleSubmit : signInHandleSubmit}>
+          <Form onSubmit={handleSubmit}>
             <Form.Group>
               <label htmlFor="email-input">Email address</label>
               <Form.Input
