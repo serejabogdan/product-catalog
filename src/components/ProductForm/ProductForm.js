@@ -14,15 +14,15 @@ function ProductForm({isDefaultForm, selectedProduct}) {
   const isDiscount = watch('discount', false);
 
   async function onSubmit(formData) {
-    const convertedFormData = formDataConvert(formData);
+    const convertedData = formDataConvert(formData);
 
     setIsUploadData(true);
     const productsRef = getProductsRef();
     try {
-      await putFileToStorage(convertedFormData.file);
-      const fileUrl = await getImageUrlFromStorage(convertedFormData.file);
-      convertedFormData.file = fileUrl;
-      putDataToDB(productsRef, convertedFormData);
+      await putFileToStorage(convertedData.file);
+      const fileUrl = await getImageUrlFromStorage(convertedData.file);
+      convertedData.file = fileUrl;
+      putDataToDB(productsRef, convertedData);
     } catch {
       console.log('Data is not uloaded');
     }
