@@ -17,26 +17,14 @@ function Products({setProductsList, productsList}) {
         productsList.push({productId: product, ...data[product]});
       }
       setProductsList(productsList);
-      console.log(productsList);
     });
   }, []);
 
   return (
     <div className="Products">
       {productsList.map((product) => {
-        const {productId, title, price, description, file, date, discount} = product;
-        return (
-          <Product
-            key={title}
-            title={title}
-            description={description}
-            file={file}
-            price={price}
-            date={date}
-            discount={discount}
-            productId={productId}
-          />
-        );
+        const {title} = product;
+        return <Product key={title} {...product} />;
       })}
     </div>
   );
