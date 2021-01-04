@@ -12,7 +12,7 @@ import Error from '../Error/Error';
 function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
   const {register, handleSubmit, errors, watch} = useForm();
-  const isDiscount = watch('discount', false);
+  const isDiscount = watch('discount', selectedProduct ? true : false);
 
   async function onSubmit(formData) {
     const convertedData = formDataConvert(formData);
