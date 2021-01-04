@@ -3,26 +3,36 @@ import {Card, Form, Button} from 'bootstrap-4-react';
 import {database, storage} from '../../firebaseConfig';
 
 import './ProductForm.css';
+import {useForm} from 'react-hook-form';
 
 export default function ProductForm() {
   const [discount, setDiscount] = useState('');
   const [isUploadData, setIsUploadData] = useState(false);
+  const {register, handleSubmit, errors} = useForm();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function onSubmit(formData) {
+    const convertedFormData = formDataConvert(formData);
+
     setIsUploadData(true);
     try {
-      const form = e.target;
-      const formData = getDataForm(form);
       const productsRef = await database.ref('Products');
-      await putFileToStorage(formData.file);
-      const fileUrl = await getImageUrlFromStorage(formData.file);
-      formData.file = fileUrl;
-      productsRef.push(formData);
+      await putFileToStorage(convertedFormData.file);
+      const fileUrl = await getImageUrlFromStorage(convertedFormData.file);
+      convertedFormData.file = fileUrl;
+      productsRef.push(convertedFormData);
     } catch {
       console.log('Data is not uloaded');
     }
     setIsUploadData(false);
+  }
+
+  function formDataConvert(data) {
+    const newData = data;
+    newData.file = data.file[0];
+    const oneDayMs = 86400000;
+    const dateInMs = Date.parse(data.date);
+    newData.date = dateInMs + oneDayMs;
+    return newData;
   }
 
   async function putFileToStorage(file) {
@@ -31,28 +41,6 @@ export default function ProductForm() {
 
   async function getImageUrlFromStorage(file) {
     return storage.ref('products').child(file.name).getDownloadURL();
-  }
-
-  function getDataForm(form) {
-    const values = {};
-    const oneDayMs = 86400000;
-    for (const field of form) {
-      const {name} = field;
-
-      if (name) {
-        const {type, value} = field;
-
-        if (type === 'file') {
-          values[name] = field.files[0];
-        } else if (type === 'date') {
-          const dateInMs = Date.parse(value);
-          values[name] = dateInMs + oneDayMs;
-        } else {
-          values[name] = value;
-        }
-      }
-    }
-    return values;
   }
 
   function DateToday() {
@@ -71,42 +59,72 @@ export default function ProductForm() {
     <div className="ProductForm">
       <Card>
         <Card.Body>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <Form.Group>
               <label htmlFor="title">Заголовок*</label>
-              <Form.Input type="text" name="title" id="title" placeholder="Введите заголовок" />
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="Введите заголовок"
+                className="form-control"
+                ref={register({required: true, minLength: 20, maxLength: 60})}
+              />
             </Form.Group>
             <Form.Group>
               <label htmlFor="file">Фото*</label>
-              <Form.CustomFile id="file" name="file">
-                Выберите фото
-              </Form.CustomFile>
+              <input type="file" name="file" id="file" className="input-block" ref={register({required: true})} />
             </Form.Group>
             <Form.Group>
               <label htmlFor="description">Описание товара</label>
-              <Form.Textarea id="description" name="description" rows="3"></Form.Textarea>
+              <textarea
+                type="text"
+                id="description"
+                name="description"
+                rows="3"
+                className="form-control"
+                ref={register({maxLength: 200})}
+              />
             </Form.Group>
             <Form.Group>
               <label htmlFor="price">Цена*</label>
-              <Form.Input type="text" id="price" name="price" placeholder="99999999.99$" />
+              <input
+                type="text"
+                name="price"
+                id="price"
+                className="form-control"
+                placeholder="99999999.99$"
+                ref={register({
+                  required: true,
+                  max: 99999999.99 /* pattern: /^\d{1,8}[.]?\d{1,2}$/ */
+                })}
+              />
             </Form.Group>
             <Form.Group>
               <label htmlFor="discount">Процент скидки</label>
-              <Form.Input
+              <input
                 type="text"
-                id="discount"
                 name="discount"
+                className="form-control"
                 placeholder="10-90%"
-                onChange={(e) => setDiscount(e.target.value)}
+                id="discount"
+                ref={register({min: 10, max: 90})}
                 value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
               />
             </Form.Group>
             {discount && (
               <Form.Group>
                 <label htmlFor="discount-end-date">Дата окончания скидки*</label>
-                <div className="date">
-                  <input type="date" id="discount-end-date" name="date" min={DateToday()} defaultValue={DateToday()} />
-                </div>
+                <input
+                  type="date"
+                  id="discount-end-date"
+                  className="input-block"
+                  name="date"
+                  min={DateToday()}
+                  defaultValue={DateToday()}
+                  ref={register({required: true})}
+                />
               </Form.Group>
             )}
             <Button primary type="submit" disabled={isUploadData}>
