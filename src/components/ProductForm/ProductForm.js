@@ -35,6 +35,7 @@ export default function ProductForm() {
 
   function getDataForm(form) {
     const values = {};
+    const oneDayMs = 86400000;
     for (const field of form) {
       const {name} = field;
 
@@ -45,7 +46,7 @@ export default function ProductForm() {
           values[name] = field.files[0];
         } else if (type === 'date') {
           const dateInMs = Date.parse(value);
-          values[name] = dateInMs;
+          values[name] = dateInMs + oneDayMs;
         } else {
           values[name] = value;
         }
