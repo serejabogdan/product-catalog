@@ -49,6 +49,7 @@ function Auth(props) {
                 id="email-input"
                 placeholder="Enter email"
                 value={userData.email}
+                required
                 onChange={(e) => setUserData((state) => ({...state, email: e.target.value}))}
               />
             </Form.Group>
@@ -59,6 +60,7 @@ function Auth(props) {
                 id="password-imput"
                 placeholder="Password"
                 value={userData.password}
+                required
                 onChange={(e) => setUserData((state) => ({...state, password: e.target.value}))}
               />
             </Form.Group>
