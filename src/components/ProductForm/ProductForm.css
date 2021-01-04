@@ -1,0 +1,18 @@
+.ProductForm {
+  min-height: 100vh;
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-block {
+  display: block;
+}
+
+.alert {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 8px;
+}
