@@ -1,1 +1,1 @@
-export const PATH_PRODUCTS = 'Products';
+export const PATH_PRODUCTS = 'products';
