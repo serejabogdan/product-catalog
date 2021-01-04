@@ -2,8 +2,12 @@ import React from 'react';
 import {Card, Button} from 'bootstrap-4-react';
 import './Product.css';
 import {database} from '../../firebaseConfig';
+import {connect} from 'react-redux';
+import {setIdSelectedProduct} from '../../redux/actions';
+import {useHistory} from 'react-router-dom';
 
-export default function Product({productId, title, price, description, file, date, discount}) {
+function Product({productId, title, price, description, file, date, discount, setIdSelectedProduct}) {
+  const history = useHistory();
   const isDiscountValid = date > Date.now();
 
   function getDiscountDaysLeft() {
@@ -40,6 +44,11 @@ export default function Product({productId, title, price, description, file, dat
     database.ref(`Products/${productId}`).remove();
   }
 
+  function onChangeProduct() {
+    setIdSelectedProduct(productId);
+    history.push('/change-form');
+  }
+
   return (
     <div className="Product">
       <Card>
@@ -62,9 +71,17 @@ export default function Product({productId, title, price, description, file, dat
           <Button className="delete-button" primary onClick={onDeleteProduct}>
             Удалить
           </Button>
-          <Button primary>Изменить</Button>
+          <Button primary onClick={onChangeProduct}>
+            Изменить
+          </Button>
         </Card.Footer>
       </Card>
     </div>
   );
 }
+
+const mapDispatchToProps = {
+  setIdSelectedProduct
+};
+
+export default connect(null, mapDispatchToProps)(Product);
