@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {setProductsList} from '../../redux/actions';
 import {getRef} from '../../utils/database';
 import {PATH_PRODUCTS} from '../../utils/constants';
+import Error from '../Error/Error';
 
 function Products({setProductsList, productsList}) {
   useEffect(() => {
@@ -22,10 +23,14 @@ function Products({setProductsList, productsList}) {
 
   return (
     <div className="Products">
-      {productsList.map((product) => {
-        const {title} = product;
-        return <Product key={title} {...product} />;
-      })}
+      {productsList.length ? (
+        productsList.map((product) => {
+          const {title} = product;
+          return <Product key={title} {...product} />;
+        })
+      ) : (
+        <Error error={{message: 'Список пуст. Перейдите на страницу с формой добавления продукта.'}} />
+      )}
     </div>
   );
 }
