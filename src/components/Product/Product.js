@@ -36,7 +36,7 @@ function Product({productId, title, price, description, file, date, discount, se
     <div className="product">
       <Card>
         <div className="product__image">
-          <img src={file} alt="" />
+          <img src={file} alt="Картинка продукта" />
         </div>
         <Card.Body>
           <Card.Title>{title}</Card.Title>
