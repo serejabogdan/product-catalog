@@ -1,22 +1,29 @@
 import React, {useState} from 'react';
 import {Card, Form, Button} from 'bootstrap-4-react';
 import './ProductForm.css';
-import {useForm} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 import {connect} from 'react-redux';
 import {getRef} from '../../utils/database';
 import {PATH_PRODUCTS} from '../../utils/constants';
 import {getImageUrlFromStorage, putFileToStorage} from '../../utils/storage';
 import {formDataConvert, getDateToday} from '../../utils/utils';
 import Error from '../Error/Error';
+import inputGroup from 'bootstrap-4-react/lib/components/inputGroup';
 
 function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
-  const {register, handleSubmit, errors, watch} = useForm();
+  const [isFileValid, setIsFileValid] = useState(false);
+  const {register, handleSubmit, errors, watch, control} = useForm();
   const isDiscount = watch('discount', selectedProduct && selectedProduct.discount ? true : false);
+  const isFile = watch('file', false);
 
   async function onSubmit(formData) {
+    if (!isFileValid) {
+      return;
+    }
+    console.log(formData);
     const convertedData = formDataConvert(formData);
-
+    debugger;
     setIsUploadData(true);
     const productsRef = getProductsRef();
     try {
@@ -28,6 +35,30 @@ function ProductForm({isDefaultForm, selectedProduct}) {
       console.log('Data is not uloaded');
     }
     setIsUploadData(false);
+  }
+
+  async function photoValidation(file) {
+    const reader = new FileReader();
+    const img = new Image();
+
+    reader.onloadend = () => {
+      img.onload = () => {
+        const minimumSize = 200;
+        const maximumSize = 4000;
+        const isFileSizeInvalid =
+          img.width < minimumSize || img.height < minimumSize || img.width > maximumSize || img.height > maximumSize;
+        if (isFileSizeInvalid) {
+          setIsFileValid(false);
+        } else {
+          setIsFileValid(true);
+        }
+      };
+
+      img.onerror = () => setIsFileValid(false);
+      img.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
   }
 
   function getProductsRef() {
@@ -72,14 +103,26 @@ function ProductForm({isDefaultForm, selectedProduct}) {
             </Form.Group>
             <Form.Group>
               <label htmlFor="file">Фото*</label>
-              <input
-                type="file"
+              <Controller
+                control={control}
                 name="file"
-                id="file"
-                className="input-block"
-                ref={register({required: 'Фото не загружено.'})}
+                rules={{required: 'Фото не загружено.'}}
+                render={({onChange}) => (
+                  <input
+                    type="file"
+                    id="file"
+                    className="input-block"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      const files = e.target.files;
+                      onChange(files);
+                      photoValidation(file);
+                    }}
+                  />
+                )}
               />
               <Error error={errors.file} />
+              {isFile && !isFileValid && <Error error={{message: 'Картинка неправильного размера.'}} />}
             </Form.Group>
             <Form.Group>
               <label htmlFor="description">Описание товара</label>
