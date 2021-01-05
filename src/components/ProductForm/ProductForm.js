@@ -12,7 +12,7 @@ import Error from '../Error/Error';
 function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
   const {register, handleSubmit, errors, watch} = useForm();
-  const isDiscount = watch('discount', selectedProduct ? true : false);
+  const isDiscount = watch('discount', selectedProduct && selectedProduct.discount ? true : false);
 
   async function onSubmit(formData) {
     const convertedData = formDataConvert(formData);
@@ -105,10 +105,8 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 placeholder="99999999.99$"
                 ref={register({
                   required: 'Цена не введена.',
-                  max: {
-                    value: 99999999.9,
-                    message: 'Максимальное значение 99999999.9'
-                  } /* pattern: /^\d{1,8}[.]?\d{1,2}$/ */
+                  maxLength: {value: '11', message: 'Неверно введена цена.'},
+                  pattern: {value: /^(\d{1,8}|\d{1,8}\.{1}\d{1,2})$/, message: 'Неверно введена цена.'}
                 })}
               />
               <Error error={errors.price} />
@@ -124,7 +122,9 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 name="discount"
                 ref={register({
                   min: {value: 10, message: 'Минимальное значение 10.'},
-                  max: {value: 90, message: 'Максимальное значение 90.'}
+                  max: {value: 90, message: 'Максимальное значение 90.'},
+                  maxLength: {value: 2, message: 'Слишком длинное значение.'},
+                  pattern: {value: /^\d{1,2}$/, message: 'Вводить можно только числа.'}
                 })}
               />
               <Error error={errors.discount} />
