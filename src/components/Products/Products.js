@@ -24,10 +24,7 @@ function Products({setProductsList, productsList}) {
   return (
     <div className="Products">
       {productsList.length ? (
-        productsList.map((product) => {
-          const {title} = product;
-          return <Product key={title} {...product} />;
-        })
+        productsList.map((product, index) => <Product key={index} {...product} />)
       ) : (
         <Error error={{message: 'Список пуст. Перейдите на страницу с формой добавления продукта.'}} />
       )}

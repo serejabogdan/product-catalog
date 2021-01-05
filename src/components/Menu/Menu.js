@@ -18,7 +18,7 @@ export default function Menu() {
       )}
       {pathname !== formPath && (
         <NavLink to={formPath} className="menu__link">
-          <Button primary>Форма</Button>
+          <Button primary>Добавить</Button>
         </NavLink>
       )}
 

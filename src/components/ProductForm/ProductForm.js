@@ -1,22 +1,30 @@
 import React, {useState} from 'react';
 import {Card, Form, Button} from 'bootstrap-4-react';
 import './ProductForm.css';
-import {useForm} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 import {connect} from 'react-redux';
 import {getRef} from '../../utils/database';
 import {PATH_PRODUCTS} from '../../utils/constants';
 import {getImageUrlFromStorage, putFileToStorage} from '../../utils/storage';
 import {formDataConvert, getDateToday} from '../../utils/utils';
 import Error from '../Error/Error';
+import {useHistory} from 'react-router-dom';
 
 function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
-  const {register, handleSubmit, errors, watch} = useForm();
-  const isDiscount = watch('discount', selectedProduct ? true : false);
+  const [isFileValid, setIsFileValid] = useState(false);
+  const {register, handleSubmit, errors, watch, control} = useForm();
+  const isDiscount = watch('discount', selectedProduct && selectedProduct.discount ? true : false);
+  const isFile = watch('file', false);
+  const history = useHistory();
 
   async function onSubmit(formData) {
+    if (!isFileValid) {
+      return;
+    }
+    console.log(formData);
     const convertedData = formDataConvert(formData);
-
+    debugger;
     setIsUploadData(true);
     const productsRef = getProductsRef();
     try {
@@ -24,10 +32,35 @@ function ProductForm({isDefaultForm, selectedProduct}) {
       const fileUrl = await getImageUrlFromStorage(convertedData.file);
       convertedData.file = fileUrl;
       putDataToDB(productsRef, convertedData);
+      history.push(`/${PATH_PRODUCTS}`);
     } catch {
       console.log('Data is not uloaded');
     }
     setIsUploadData(false);
+  }
+
+  async function photoValidation(file) {
+    const reader = new FileReader();
+    const img = new Image();
+
+    reader.onloadend = () => {
+      img.onload = () => {
+        const minimumSize = 200;
+        const maximumSize = 4000;
+        const isFileSizeInvalid =
+          img.width < minimumSize || img.height < minimumSize || img.width > maximumSize || img.height > maximumSize;
+        if (isFileSizeInvalid) {
+          setIsFileValid(false);
+        } else {
+          setIsFileValid(true);
+        }
+      };
+
+      img.onerror = () => setIsFileValid(false);
+      img.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
   }
 
   function getProductsRef() {
@@ -72,14 +105,26 @@ function ProductForm({isDefaultForm, selectedProduct}) {
             </Form.Group>
             <Form.Group>
               <label htmlFor="file">Фото*</label>
-              <input
-                type="file"
+              <Controller
+                control={control}
                 name="file"
-                id="file"
-                className="input-block"
-                ref={register({required: 'Фото не загружено.'})}
+                rules={{required: 'Фото не загружено.'}}
+                render={({onChange}) => (
+                  <input
+                    type="file"
+                    id="file"
+                    className="input-block"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      const files = e.target.files;
+                      onChange(files);
+                      photoValidation(file);
+                    }}
+                  />
+                )}
               />
               <Error error={errors.file} />
+              {isFile && !isFileValid && <Error error={{message: 'Картинка неправильного размера.'}} />}
             </Form.Group>
             <Form.Group>
               <label htmlFor="description">Описание товара</label>
@@ -105,10 +150,8 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 placeholder="99999999.99$"
                 ref={register({
                   required: 'Цена не введена.',
-                  max: {
-                    value: 99999999.9,
-                    message: 'Максимальное значение 99999999.9'
-                  } /* pattern: /^\d{1,8}[.]?\d{1,2}$/ */
+                  maxLength: {value: '11', message: 'Неверно введена цена.'},
+                  pattern: {value: /^(\d{1,8}|\d{1,8}\.{1}\d{1,2})$/, message: 'Неверно введена цена.'}
                 })}
               />
               <Error error={errors.price} />
@@ -124,7 +167,9 @@ function ProductForm({isDefaultForm, selectedProduct}) {
                 name="discount"
                 ref={register({
                   min: {value: 10, message: 'Минимальное значение 10.'},
-                  max: {value: 90, message: 'Максимальное значение 90.'}
+                  max: {value: 90, message: 'Максимальное значение 90.'},
+                  maxLength: {value: 2, message: 'Слишком длинное значение.'},
+                  pattern: {value: /^\d{1,2}$/, message: 'Вводить можно только числа.'}
                 })}
               />
               <Error error={errors.discount} />
