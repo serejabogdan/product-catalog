@@ -8,7 +8,7 @@ import {PATH_PRODUCTS} from '../../utils/constants';
 import {getImageUrlFromStorage, putFileToStorage} from '../../utils/storage';
 import {formDataConvert, getDateToday} from '../../utils/utils';
 import Error from '../Error/Error';
-import inputGroup from 'bootstrap-4-react/lib/components/inputGroup';
+import {useHistory} from 'react-router-dom';
 
 function ProductForm({isDefaultForm, selectedProduct}) {
   const [isUploadData, setIsUploadData] = useState(false);
@@ -16,6 +16,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
   const {register, handleSubmit, errors, watch, control} = useForm();
   const isDiscount = watch('discount', selectedProduct && selectedProduct.discount ? true : false);
   const isFile = watch('file', false);
+  const history = useHistory();
 
   async function onSubmit(formData) {
     if (!isFileValid) {
@@ -31,6 +32,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
       const fileUrl = await getImageUrlFromStorage(convertedData.file);
       convertedData.file = fileUrl;
       putDataToDB(productsRef, convertedData);
+      history.push(`/${PATH_PRODUCTS}`);
     } catch {
       console.log('Data is not uloaded');
     }
