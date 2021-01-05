@@ -5,10 +5,6 @@
   margin: 1rem 0;
 }
 
-.card-body {
-  padding-top: 0;
-}
-
 .product__delete-button {
   margin-right: 1rem;
 }
@@ -24,6 +20,13 @@
 
 .product__discount-active {
   text-decoration: line-through;
+}
+
+.product__image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 auto;
 }
 
 .product__image img {
