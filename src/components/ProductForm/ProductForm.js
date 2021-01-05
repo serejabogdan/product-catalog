@@ -22,19 +22,28 @@ function ProductForm({isDefaultForm, selectedProduct}) {
     if (!isFileValid) {
       return;
     }
-    const convertedData = formDataConvert(formData);
     setIsUploadData(true);
+    const convertedData = formDataConvert(formData);
     const productsRef = getProductsRef();
     try {
-      await putFileToStorage(convertedData.file);
-      const fileUrl = await getImageUrlFromStorage(convertedData.file);
-      convertedData.file = fileUrl;
+      convertedData.file = await getFileUrl(convertedData.file);
       putDataToDB(productsRef, convertedData);
       history.push(`/${PATH_PRODUCTS}`);
     } catch {
       console.error('Data is not uloaded');
     }
     setIsUploadData(false);
+  }
+
+  async function getFileUrl(file) {
+    let fileUrl = '';
+    try {
+      fileUrl = await getImageUrlFromStorage(file);
+    } catch {
+      await putFileToStorage(file);
+      fileUrl = await getImageUrlFromStorage(file);
+    }
+    return fileUrl;
   }
 
   function photoValidation(file) {
