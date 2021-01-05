@@ -22,9 +22,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
     if (!isFileValid) {
       return;
     }
-    console.log(formData);
     const convertedData = formDataConvert(formData);
-    debugger;
     setIsUploadData(true);
     const productsRef = getProductsRef();
     try {
@@ -34,21 +32,21 @@ function ProductForm({isDefaultForm, selectedProduct}) {
       putDataToDB(productsRef, convertedData);
       history.push(`/${PATH_PRODUCTS}`);
     } catch {
-      console.log('Data is not uloaded');
+      console.error('Data is not uloaded');
     }
     setIsUploadData(false);
   }
 
-  async function photoValidation(file) {
+  function photoValidation(file) {
     const reader = new FileReader();
     const img = new Image();
 
     reader.onloadend = () => {
       img.onload = () => {
-        const minimumSize = 200;
-        const maximumSize = 4000;
+        const minFileSize = 200;
+        const maxFileSize = 4000;
         const isFileSizeInvalid =
-          img.width < minimumSize || img.height < minimumSize || img.width > maximumSize || img.height > maximumSize;
+          img.width < minFileSize || img.height < minFileSize || img.width > maxFileSize || img.height > maxFileSize;
         if (isFileSizeInvalid) {
           setIsFileValid(false);
         } else {
