@@ -54,10 +54,10 @@ function Auth(props) {
               />
             </Form.Group>
             <Form.Group>
-              <label htmlFor="password-imput">Пароль</label>
+              <label htmlFor="password-input">Пароль</label>
               <Form.Input
                 type="password"
-                id="password-imput"
+                id="password-input"
                 placeholder="Введите пароль"
                 value={userData.password}
                 required
