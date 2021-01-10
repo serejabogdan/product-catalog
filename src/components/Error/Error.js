@@ -6,7 +6,7 @@ export default function Error({error}) {
   return (
     <>
       {error && (
-        <Alert className="alert" danger>
+        <Alert className="custom-alert" danger>
           {error.message}
         </Alert>
       )}

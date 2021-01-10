@@ -47,6 +47,7 @@ function ProductForm({isDefaultForm, selectedProduct}) {
   }
 
   function photoValidation(file) {
+    setIsUploadData(true);
     const reader = new FileReader();
     const img = new Image();
 
@@ -61,6 +62,8 @@ function ProductForm({isDefaultForm, selectedProduct}) {
         } else {
           setIsFileValid(true);
         }
+
+        setIsUploadData(false);
       };
 
       img.onerror = () => setIsFileValid(false);
