@@ -40,25 +40,25 @@ function Auth(props) {
     <div className="Auth">
       <Card>
         <Card.Body>
-          <Card.Title>{isSignUp ? 'Sign Up' : 'Sign In'}</Card.Title>
+          <Card.Title>{isSignUp ? 'Регистрация' : 'Вход'}</Card.Title>
           <Form onSubmit={handleSubmit}>
             <Form.Group>
-              <label htmlFor="email-input">Email address</label>
+              <label htmlFor="email-input">Электронный адрес</label>
               <Form.Input
                 type="email"
                 id="email-input"
-                placeholder="Enter email"
+                placeholder="Введите email"
                 value={userData.email}
                 required
                 onChange={(e) => setUserData((state) => ({...state, email: e.target.value}))}
               />
             </Form.Group>
             <Form.Group>
-              <label htmlFor="password-imput">Password</label>
+              <label htmlFor="password-imput">Пароль</label>
               <Form.Input
                 type="password"
                 id="password-imput"
-                placeholder="Password"
+                placeholder="Введите пароль"
                 value={userData.password}
                 required
                 onChange={(e) => setUserData((state) => ({...state, password: e.target.value}))}
@@ -66,7 +66,7 @@ function Auth(props) {
             </Form.Group>
             <Form.Group></Form.Group>
             <Button primary type="submit">
-              Submit
+              Далее
             </Button>
           </Form>
           <div className="signin-link">
